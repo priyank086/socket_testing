@@ -2,13 +2,18 @@
 <html>
 <head>
     <title>WebSocket Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <h1>WebSocket Chat</h1>
 
-    <label for="client-id">Client ID:</label>
-    <input type="text" id="client-id" placeholder="Enter client ID">
-    <button onclick="connectWebSocket()">Connect</button>
+    <label for="user-id">Your User ID:</label>
+    <input type="text" id="user-id" placeholder="Enter your User ID">
+    <button onclick="loadUserList()">Load User List</button>
+
+    <div id="user-list" style="display:none;">
+        <!-- User list will be populated here -->
+    </div>
 
     <div id="chat-box" style="display:none;">
         <!-- Chat messages will appear here -->
@@ -19,18 +24,40 @@
 
     <script>
         let ws;
-        let clientId;
+        let userId;
+        let receiverId;
+
+        async function loadUserList() {
+            userId = document.getElementById('user-id').value;
+            localStorage.setItem('userId', userId);
+
+            const response = await axios.get('http://localhost/socket-testing/users.json');
+            const users = response.data;
+
+            const userListDiv = document.getElementById('user-list');
+            userListDiv.style.display = 'block';
+            
+            users.forEach(user => {
+                if (user._id !== userId) {
+                    const userElement = document.createElement('div');
+                    userElement.innerHTML = user.name;
+                    userElement.onclick = () => setReceiver(user._id);
+                    userListDiv.appendChild(userElement);
+                }
+            });
+        }
+
+        function setReceiver(id) {
+            receiverId = id;
+            connectWebSocket();
+        }
 
         function connectWebSocket() {
-            clientId = document.getElementById('client-id').value;
             ws = new WebSocket('ws://localhost:5678');
-
             ws.addEventListener('open', function(event) {
-                console.log('Connected to WebSocket');
                 document.getElementById('chat-box').style.display = 'block';
                 document.getElementById('message').style.display = 'inline';
                 document.getElementById('send-button').style.display = 'inline';
-                document.getElementById('client-id').style.display = 'none';
             });
 
             ws.addEventListener('message', function(event) {
@@ -45,14 +72,21 @@
             const message = messageInput.value;
 
             const payload = {
-                sender_id: clientId,
-                receiver_id: 'client2',  // Replace with actual receiver ID
+                sender_id: userId,
+                receiver_id: receiverId,
                 text: message,
-                chat_id: 'chat1'  // Replace with actual chat ID
+                chat_id: 'chat1'
             };
 
             ws.send(JSON.stringify(payload));
             messageInput.value = '';
+        }
+
+        // Initialize with stored userId if available
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+            document.getElementById('user-id').value = storedUserId;
+            loadUserList();
         }
     </script>
 </body>
