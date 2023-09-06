@@ -1,0 +1,58 @@
+[
+    {
+        "_id": "64ae89adaf680bdd164538b6",
+        "email": "upajsabat990@gmail.com",
+        "restaurants": [],
+        "login_type": "google",
+        "created_at": "2023-07-12T11:08:29.519Z",
+        "__v": 0,
+        "name": "Upaj Kumar Sabat",
+        "phone": "8908117931",
+        "profile": "https://firebasestorage.googleapis.com/v0/b/bohfy-68dc3.appspot.com/o/uploads%2FprofilePicture.jpg?alt=media&token=bad9018b-a6ed-4be4-9752-95b9a89bbeaf",
+        "date_of_birth": "1999-01-10T00:00:00.000",
+        "gender": "Male",
+        "preference": "Vegan",
+        "restaurant": "63b51f5e0175602641d35d9a"
+    },
+    {
+        "_id": "64c945754be6a3814ea37004",
+        "email": "shwetank.bhargava@gmail.com",
+        "restaurants": [],
+        "login_type": "google",
+        "created_at": "2023-08-01T17:48:37.342Z",
+        "__v": 0,
+        "name": "Shweta",
+        "date_of_birth": "1993-08-01T00:00:00.000",
+        "gender": "Female",
+        "preference": "Vegan",
+        "profile": "https://firebasestorage.googleapis.com/v0/b/bohfy-68dc3.appspot.com/o/uploads%2FprofilePicture_1691605128407.jpg?alt=media&token=b142cc66-11c8-455f-86ec-15a1ad55f0db",
+        "restaurant": "63b51f5e0175602641d35d9a"
+    },
+    {
+        "_id": "6486c84b0b0936f90f7f3514",
+        "email": "priyankbhargava2008@gmail.com",
+        "restaurants": [],
+        "login_type": "google",
+        "created_at": "2023-06-12T07:24:59.267Z",
+        "__v": 0,
+        "profile": "https://firebasestorage.googleapis.com/v0/b/bohfy-68dc3.appspot.com/o/uploads%2FprofilePicture_1691605068507.jpg?alt=media&token=27340ac3-2248-436b-a0b3-f1b5d1e91f2f",
+        "name": "Priyank Bhargava",
+        "gender": "Male",
+        "preference": "Vegetarian",
+        "date_of_birth": "2011-06-01T00:00:00.000",
+        "restaurant": "63b51f5e0175602641d35d9a"
+    },
+    {
+        "_id": "64dd9341dc9b7deb049c4b45",
+        "email": "upendrakumarsabat992@gmail.com",
+        "restaurants": [],
+        "login_type": "google",
+        "created_at": "2023-08-17T03:25:53.867Z",
+        "__v": 0,
+        "name": "Upaj 2",
+        "phone": "7978026450",
+        "date_of_birth": "2023-08-17T00:00:00.000",
+        "profile": "https://firebasestorage.googleapis.com/v0/b/bohfy-68dc3.appspot.com/o/uploads%2FprofilePicture.jpg?alt=media&token=e40c8d35-fe33-495a-b314-c3237322c53c",
+        "restaurant": "63b51f5e0175602641d35d9a"
+    }
+]
