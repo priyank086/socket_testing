@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+
+    <div id="chat-box">
+        <!-- Chat messages will appear here -->
+    </div>
+
+    <input type="text" id="message" placeholder="Type your message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        // Connect to WebSocket server
+        const ws = new WebSocket('ws://localhost:5678');
+
+        ws.addEventListener('open', function(event) {
+            console.log('Connected to WebSocket');
+        });
+
+        ws.addEventListener('message', function(event) {
+            const data = JSON.parse(event.data);
+            console.log("Received data:", data);  // Log received data for debugging
+
+            if (data.sender_id && data.text) {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML += `<p><strong>${data.sender_id}:</strong> ${data.text}</p>`;
+            } else {
+                console.warn("Incomplete message received", data);
+            }
+        });
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const message = messageInput.value;
+
+            const payload = {
+                sender_id: 'client2',  // Replace with actual sender ID
+                receiver_id: 'client1',  // Replace with actual receiver ID
+                text: message,
+                chat_id: 'chat1'  // Replace with actual chat ID
+            };
+
+            ws.send(JSON.stringify(payload));
+            messageInput.value = '';
+        }
+    </script>
+</body>
+</html>

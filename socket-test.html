@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Connection Test</h1>
+    <p>Status: <span id="status">Connecting...</span></p>
+    <p>Message from Server: <span id="message">Waiting...</span></p>
+
+    <script>
+        var ws = new WebSocket('ws://13.233.164.184:5678');
+
+        ws.onopen = function() {
+            document.getElementById('status').innerText = 'Connected';
+        };
+
+        ws.onmessage = function(event) {
+            document.getElementById('message').innerText = event.data;
+        };
+
+        ws.onclose = function() {
+            document.getElementById('status').innerText = 'Disconnected';
+        };
+
+        ws.onerror = function(error) {
+            console.log('WebSocket Error: ' + error);
+            document.getElementById('status').innerText = 'Error';
+        };
+    </script>
+</body>
+</html>

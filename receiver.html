@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiver</title>
+</head>
+<body>
+    <h1>Receiver Chat</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const chatDiv = document.getElementById('chat');
+        const ws = new WebSocket('ws://localhost:5678');
+
+        ws.onmessage = function (event) {
+            chatDiv.innerHTML += '<div>Server: ' + event.data + '</div>';
+        };
+
+        function sendMessage() {
+            const message = document.getElementById('message').value;
+            const data = {
+                sender_id: "receiver", // Now receiver is acting as the sender
+                receiver_id: "sender",
+                text: message
+            };
+
+            ws.send(JSON.stringify(data));
+            chatDiv.innerHTML += '<div>You: ' + message + '</div>';
+        }
+    </script>
+</body>
+</html>
