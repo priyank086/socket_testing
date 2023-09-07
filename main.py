@@ -19,6 +19,10 @@ redis_client = redis.Redis(host=REDIS_IP, port=6379, db=0)
 # List to keep track of connected clients
 connected_clients = []
 
+async def load_messages_by_id(chat_id):
+    messages = redis_client.lrange(f"messages:{chat_id}", 0, -1)
+    return [json.loads(message.decode('utf-8')) for message in messages]
+
 async def echo(websocket, path):
     connected_clients.append(websocket)
     try:
@@ -28,6 +32,12 @@ async def echo(websocket, path):
             try:
                 data = json.loads(message)
                 logging.info(f"Received data: {data}")
+
+                if 'command' in data and data['command'] == 'load_messages':
+                    chat_id = data.get('chat_id', '')
+                    messages = await load_messages_by_id(chat_id)
+                    await websocket.send(json.dumps({'command': 'load_messages', 'messages': messages}))
+                    continue
 
                 if 'text' not in data:
                     logging.error("Missing 'text' key in received data")
@@ -39,10 +49,14 @@ async def echo(websocket, path):
                     "receiver_id": data["receiver_id"],
                     "text": data["text"],
                     "status": "pending",
-                    }
+                }
                 redis_client.rpush(f"messages:{data['chat_id']}", json.dumps(message_data))
 
                 logging.info(f"Message stored: {data['text']}")
+
+                print(f"Raw message received: {message}")
+
+
 
                 # Broadcast the message to all connected clients
                 for client in connected_clients:
