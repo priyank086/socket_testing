@@ -6,17 +6,10 @@ import redis
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
-
-# Setup logging
 logging.basicConfig(level=logging.INFO)
-
-# Redis setup
 REDIS_IP = os.getenv("REDIS_IP", "localhost")
 redis_client = redis.Redis(host=REDIS_IP, port=6379, db=0)
-
-# List to keep track of connected clients
 connected_clients = []
 
 async def load_messages_by_id(chat_id):
@@ -26,57 +19,49 @@ async def load_messages_by_id(chat_id):
 async def echo(websocket, path):
     connected_clients.append(websocket)
     try:
-        logging.info("Client connected")
-
+        print("Client connected")
         async for message in websocket:
-            try:
-                data = json.loads(message)
-                logging.info(f"Received data: {data}")
+            data = json.loads(message)
+            print(f"Raw message received: {message}")
+            sender_id = data.get("sender_id", "")
+            receiver_id = data.get("receiver_id", "")
+            chat_id = "_".join(sorted([sender_id, receiver_id]))
 
-                if 'command' in data and data['command'] == 'load_messages':
-                    chat_id = data.get('chat_id', '')
+            if 'command' in data:
+                if data['command'] == 'load_messages':
                     messages = await load_messages_by_id(chat_id)
                     await websocket.send(json.dumps({'command': 'load_messages', 'messages': messages}))
                     continue
-
-                if 'text' not in data:
-                    logging.error("Missing 'text' key in received data")
+                elif data['command'] == 'accept_request':
+                    redis_client.set(f"chat_requests:{chat_id}", "accepted")
+                    continue
+                elif data['command'] == 'reject_request':
+                    redis_client.set(f"chat_requests:{chat_id}", "rejected")
                     continue
 
-                # Store the message in Redis
-                message_data = {
-                    "sender_id": data["sender_id"],
-                    "receiver_id": data["receiver_id"],
-                    "text": data["text"],
-                    "status": "pending",
-                }
-                redis_client.rpush(f"messages:{data['chat_id']}", json.dumps(message_data))
+            if 'text' not in data:
+                print("Missing 'text' key in received data")
+                continue
 
-                logging.info(f"Message stored: {data['text']}")
+            message_data = {
+                "sender_id": sender_id,
+                "receiver_id": receiver_id,
+                "text": data["text"],
+                "status": "pending",
+            }
+            redis_client.rpush(f"messages:{chat_id}", json.dumps(message_data))
+            print(f"Message stored: {data['text']}")
 
-                print(f"Raw message received: {message}")
-
-
-
-                # Broadcast the message to all connected clients
-                for client in connected_clients:
-                    await client.send(message)
-
-            except json.JSONDecodeError:
-                logging.error("Received message is not a valid JSON")
-            except KeyError as e:
-                logging.error(f"Missing key in received data: {e}")
+            for client in connected_clients:
+                await client.send(message)
 
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
-
+        print(f"An error occurred: {e}")
     finally:
         connected_clients.remove(websocket)
 
-# Start the WebSocket server
+
 start_server = websockets.serve(echo, "0.0.0.0", 5678)
-
-logging.info("Server started on ws://0.0.0.0:5678")
-
+print("Server started on ws://0.0.0.0:5678")
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
