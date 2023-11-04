@@ -47,16 +47,23 @@ async def echo(websocket, path):
 
             # Check for special commands in the message
             if 'command' in data:
+                # Handle the 'load_messages' command
                 if data['command'] == 'load_messages':
                     messages = await load_messages_by_id(chat_id)
                     await websocket.send(json.dumps({'command': 'load_messages', 'messages': messages}))
-                    continue
+                
+                # Handle the 'accept_request' command
                 elif data['command'] == 'accept_request':
                     redis_client.set(f"chat_requests:{chat_id}", "accepted")
-                    continue
+                
+                # Handle the 'reject_request' command
                 elif data['command'] == 'reject_request':
                     redis_client.set(f"chat_requests:{chat_id}", "rejected")
-                    continue
+
+                # Handle the 'order_complete' command
+                elif data['command'] == 'order_complete':
+                    print(f"Order Complete command received with payment ID: {data['payment_id']}")
+                
 
             # Check if the 'text' key exists in the message
             if 'text' not in data:
